@@ -41,7 +41,32 @@ of(1,2,3,4)
 
 // The emitted values will be the result of op3(op2(op1(value)))
 ```
+برای درک بهتر این موضوع یک مثال میزنیم
 
+فرض کنید بعد از اینکه کاربر یک کلمه رو سرچ کرد باید اون رو ارسال کنیم و بعد که ریسپانس امد نیاز هست در ساختار اون یه تغییری بدهیم
+
+یک راهکار اینه که بعد از اینکه سرویسمون subscribe   شد اون تغییر مورد نظر را انجام بدهیم اما مشکلی که اینجا هست اگر این سرویس  در جای های مختلف استفاده شده
+
+باشد باید کد های تکراری رو انجام بدهیم و اگر بعد از مدتی نیاز به تغییر باشه باید همه رو تغییر بدهیم
+
+برای رفع این مشکل از pip  ها استفاده میکنیم
+
+```
+<input type="text" #input [(ngModel)]="search" (ngModelChange)=" subject$.next(input.value)">
+
+import {map,Subject,delay,switchMap, pluck} from "rxjs"
+this.subject$.pipe(
+      switchMap((value)=>{
+      return ajax.getJSON(`https://api.github.com/users/${value}`).pipe(delay(300));
+     }),
+map((list:any)=>{
+  return {aa:list}
+})).subscribe(console.log);
+```
+ در این مثال در سرویس مورد نظر عملیات مورد نظر رو در  pip  سرویس انجام می دهیم سپس در کامپونت ها اون رو subscribe   میکنیم
+ 
+ مقدار  از بالا به پایین پردازش می شود در این مثال ابتدا وارد switchMap  f بعد از اینکه جواب امد وارد map می شود و به صورت نا محدود میتوانیم از این   عملگرها استفاده کنیم
+ 
 ### tap
 Receives a value, takes an action which won't affect the value and returns the same value.
 Useful for side effects as logging and such.
